@@ -10,6 +10,8 @@ import pygame
 import sys
 import os
 import eyed3
+import youtube_dl
+import shutil
 
 # Configurando Banco
 banco = mysql.connector.connect(
@@ -33,7 +35,8 @@ if banco.is_connected():
 
     cursor.execute('SELECT nome FROM musicas_app')
     banco_musicas = cursor.fetchall()
-
+    #cursor.execute('DELETE FROM musicas_app')
+    #banco.commit()
 
 class FrmPrincipal(QMainWindow):
 
@@ -104,6 +107,7 @@ class FrmPrincipal(QMainWindow):
             self.ui.stackedWidget.setCurrentWidget(self.ui.musicas)
         else:
             self.ui.stackedWidget.setCurrentWidget(self.ui.home)
+
     def btn_playlist_clicked(self):
         print('Playlist')
 
@@ -126,6 +130,8 @@ class FrmPrincipal(QMainWindow):
 
                 except:
                     # Adicionando música ao banco de dados
+                    print(musica)
+
                     print('Adicionando música ao banco!')
                     comando_SQL = 'INSERT INTO musicas_app (id, nome) VALUES (%s,%s)'
                     dados = (f"{id}", f"{musica}")
@@ -141,6 +147,8 @@ class FrmPrincipal(QMainWindow):
 
     def btn_donwloader_clicked(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.downloader)
+        self.ui.btn_baixar.clicked.connect(self.download)
+        self.ui.btn_baixar_2.clicked.connect(self.diretorio_download)
 
     def passar_musica(self):
         global id_musica
@@ -186,13 +194,67 @@ class FrmPrincipal(QMainWindow):
         else:
             self.ui.lbl_nome_artista.setText(audiofile.tag.artist)
 
+    def download(self):
+        global diretorio
+
+        if diretorio != '' and self.ui.line_link != '':
+            link = self.ui.line_link.text()
+            try:
+                ydl_opts = {
+                    'format': 'bestaudio/best',
+                    'postprocessors': [{
+                        'key': 'FFmpegExtractAudio',
+                        'preferredcodec': 'mp3',
+                        'preferredquality': '192',
+                    }],
+                }
+                with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                    ydl.download([f'{link}'])
+
+            except:
+                print('sfs')
+        pasta_atual = os.path.dirname(os.path.realpath(__file__))
+        files = []
+        for (dirpath, dirnames, filenames) in os.walk(pasta_atual):
+            files.extend(filenames)
+            break
+
+        for arquivo in files:
+
+            musica = str(arquivo)
+
+            if musica[-5:] == '.webm':
+                conversao = musica.replace('.webm', '.mp3')
+                os.rename(musica, conversao)
+            if musica[-4:] == '.m4a':
+                conversao = musica.replace('.m4a', '.mp3')
+                os.rename(musica, conversao)
+
+        files.clear()
+        pasta_atual = os.path.dirname(os.path.realpath(__file__))
+        for (dirpath, dirnames, filenames) in os.walk(pasta_atual):
+            files.extend(filenames)
+            break
+
+        for arquivo in files:
+            if arquivo[-4:] == '.mp3':
+                shutil.move(arquivo, diretorio)
+
+    def diretorio_download(self):
+
+        global diretorio
+
+        Tk().withdraw()
+        diretorio = askdirectory()
+        print(diretorio)
+
 
 if __name__ == '__main__':
 
     # Variáveis do Sistema
     clique_pause_despause = 0
     id_musica = 0
-
+    diretorio = ''
     # Configuração do Sistema
     app = QApplication(sys.argv)
     window = FrmPrincipal()
