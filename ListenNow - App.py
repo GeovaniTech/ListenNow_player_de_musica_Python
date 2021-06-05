@@ -1,8 +1,6 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtPrintSupport import *
-from PyQt5.Qt import Qt
 from View.PY.ui_ListenNow import Ui_ListenNow
 from tkinter.filedialog import askopenfilenames, askdirectory
 from tkinter import Tk
@@ -10,6 +8,8 @@ from tkinter import Tk
 import mysql.connector
 import pygame
 import sys
+import os
+import eyed3
 
 # Configurando Banco
 banco = mysql.connector.connect(
@@ -46,10 +46,11 @@ class FrmPrincipal(QMainWindow):
         self.ui = Ui_ListenNow()
         self.ui.setupUi(self)
 
-        self.ui.stackedWidget.setCurrentWidget(self.ui.home)
+        self.btn_home_clicked()
         sld = self.ui.volume_slider
         sld.setRange(0, 9)
         sld.setValue(1)
+
         sld.valueChanged.connect(self.volume)
         # Clique dos botões
         self.ui.btn_home.clicked.connect(self.btn_home_clicked)
@@ -78,6 +79,7 @@ class FrmPrincipal(QMainWindow):
             pygame.mixer.music.set_volume(0.1)
             pygame.mixer.music.load(banco_musicas[0][0])
             pygame.mixer.music.play()
+            self.nome_musica_artista()
 
         # Verificando se o botão pause/despause é maior ou igual a 1
         if clique_pause_despause >= 1:
@@ -96,8 +98,12 @@ class FrmPrincipal(QMainWindow):
         pygame.mixer.music.set_volume(float(volume))
 
     def btn_home_clicked(self):
-        self.ui.stackedWidget.setCurrentWidget(self.ui.home)
+        global banco_musicas
 
+        if len(banco_musicas) > 0:
+            self.ui.stackedWidget.setCurrentWidget(self.ui.musicas)
+        else:
+            self.ui.stackedWidget.setCurrentWidget(self.ui.home)
     def btn_playlist_clicked(self):
         print('Playlist')
 
@@ -150,12 +156,13 @@ class FrmPrincipal(QMainWindow):
                 id_musica -= len(banco_musicas) - 1
                 pygame.mixer.music.load(banco_musicas[id_musica][0])
                 pygame.mixer.music.play()
-
+                self.nome_musica_artista()
             else:
                 # Adicionando mais um valor ao id, para tocar a próxima música da lista
                 id_musica += 1
                 pygame.mixer.music.load(banco_musicas[id_musica][0])
                 pygame.mixer.music.play()
+                self.nome_musica_artista()
 
     def voltar_musica(self):
 
@@ -168,6 +175,16 @@ class FrmPrincipal(QMainWindow):
             id_musica -= 1
             pygame.mixer.music.load(banco_musicas[id_musica][0])
             pygame.mixer.music.play()
+            self.nome_musica_artista()
+
+    def nome_musica_artista(self):
+        self.ui.lbl_nome_musica.setText(os.path.basename(banco_musicas[id_musica][0][:-4]))
+        audiofile = eyed3.load(banco_musicas[id_musica][0])
+
+        if audiofile.tag.artist is None:
+            self.ui.lbl_nome_artista.setText('Artista não encontrado')
+        else:
+            self.ui.lbl_nome_artista.setText(audiofile.tag.artist)
 
 
 if __name__ == '__main__':
