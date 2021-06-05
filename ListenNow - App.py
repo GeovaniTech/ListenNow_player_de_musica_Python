@@ -57,6 +57,8 @@ class FrmPrincipal(QMainWindow):
         self.ui.btn_remover.clicked.connect(self.btn_remover_musicas_clicked)
         self.ui.btn_adicionar.clicked.connect(self.btn_adicionar_musicas_clicked)
         self.ui.btn_pausar_play.clicked.connect(self.tocar_musica)
+        self.ui.btn_avancar.clicked.connect(self.passar_musica)
+        self.ui.btn_voltar.clicked.connect(self.voltar_musica)
 
     def tocar_musica(self):
 
@@ -136,16 +138,38 @@ class FrmPrincipal(QMainWindow):
 
     def passar_musica(self):
         global id_musica
+        global banco_musicas
         global clique_pause_despause
 
-        if clique_pause_despause % 2 == 1:
-            clique_pause_despause -= 1
-        id_musica += 1
-        pygame.mixer.music.load(banco_musicas[id_musica][0])
-        pygame.mixer.music.play()
+        if clique_pause_despause > 0 and len(banco_musicas) > 1:
+
+            # Verificando se chegou na última música da lista
+            if id_musica == len(banco_musicas) - 1:
+
+                # Resetando id para 0
+                id_musica -= len(banco_musicas) - 1
+                pygame.mixer.music.load(banco_musicas[id_musica][0])
+                pygame.mixer.music.play()
+
+            else:
+                # Adicionando mais um valor ao id, para tocar a próxima música da lista
+                id_musica += 1
+                pygame.mixer.music.load(banco_musicas[id_musica][0])
+                pygame.mixer.music.play()
 
     def voltar_musica(self):
-        print('aa')
+
+        # Pagando a variável global com o id da musica e o banco de dados
+        global id_musica
+        global banco_musicas
+
+        # Verificando se id da música é maior ou igual a 1, para assim tirar um valor do id
+        if id_musica >= 1:
+            id_musica -= 1
+            pygame.mixer.music.load(banco_musicas[id_musica][0])
+            pygame.mixer.music.play()
+
+
 if __name__ == '__main__':
 
     # Variáveis do Sistema
