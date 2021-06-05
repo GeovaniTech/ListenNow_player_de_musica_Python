@@ -55,6 +55,10 @@ class FrmPrincipal(QMainWindow):
         sld.setValue(1)
 
         sld.valueChanged.connect(self.volume)
+        self.ui.btn_pausar_play.setStyleSheet(
+            'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
+            'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
+
         # Clique dos botões
         self.ui.btn_home.clicked.connect(self.btn_home_clicked)
         self.ui.btn_download.clicked.connect(self.btn_donwloader_clicked)
@@ -90,9 +94,13 @@ class FrmPrincipal(QMainWindow):
             # Pausando a Música
             if clique_pause_despause % 2 == 0:
                 pygame.mixer.music.pause()
+                self.ui.btn_pausar_play.setStyleSheet('QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
+                                                      'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
 
             # Despausando a Música
             else:
+                self.ui.btn_pausar_play.setStyleSheet('QPushButton {border: 0px solid;background-image: url(:/aaa/pause.png);}'
+                                                      'QPushButton:hover {background-image: url(:/aaa/pause_hover.png);}')
                 pygame.mixer.music.unpause()
 
     def volume(self, value):
@@ -186,8 +194,11 @@ class FrmPrincipal(QMainWindow):
             self.nome_musica_artista()
 
     def nome_musica_artista(self):
-        self.ui.lbl_nome_musica.setText(os.path.basename(banco_musicas[id_musica][0][:-4]))
         audiofile = eyed3.load(banco_musicas[id_musica][0])
+        if audiofile.tag.title is None:
+            self.ui.lbl_nome_musica.setText(os.path.basename(banco_musicas[id_musica][0][:-4]))
+        else:
+            self.ui.lbl_nome_musica.setText(audiofile.tag.title)
 
         if audiofile.tag.artist is None:
             self.ui.lbl_nome_artista.setText('Artista não encontrado')
