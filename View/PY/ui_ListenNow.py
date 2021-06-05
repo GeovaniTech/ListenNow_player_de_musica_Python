@@ -296,9 +296,9 @@ class Ui_ListenNow(object):
         self.btn_avancar.setText("")
         self.btn_avancar.setIconSize(QtCore.QSize(30, 30))
         self.btn_avancar.setObjectName("btn_avancar")
-        self.btn_pausar_paly = QtWidgets.QPushButton(self.frame_2)
-        self.btn_pausar_paly.setGeometry(QtCore.QRect(372, 13, 60, 60))
-        self.btn_pausar_paly.setStyleSheet("QPushButton {\n"
+        self.btn_pausar_play = QtWidgets.QPushButton(self.frame_2)
+        self.btn_pausar_play.setGeometry(QtCore.QRect(372, 13, 60, 60))
+        self.btn_pausar_play.setStyleSheet("QPushButton {\n"
 "border: 0px solid;\n"
 "background-image: url(:/aaa/pause.png);\n"
 "}\n"
@@ -308,9 +308,9 @@ class Ui_ListenNow(object):
 "}\n"
 "\n"
 "")
-        self.btn_pausar_paly.setText("")
-        self.btn_pausar_paly.setIconSize(QtCore.QSize(30, 30))
-        self.btn_pausar_paly.setObjectName("btn_pausar_paly")
+        self.btn_pausar_play.setText("")
+        self.btn_pausar_play.setIconSize(QtCore.QSize(30, 30))
+        self.btn_pausar_play.setObjectName("btn_play_paly")
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
         self.stackedWidget.setGeometry(QtCore.QRect(230, 0, 771, 461))
         self.stackedWidget.setStyleSheet("")
