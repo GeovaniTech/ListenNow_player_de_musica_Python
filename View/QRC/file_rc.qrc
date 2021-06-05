@@ -1,0 +1,29 @@
+<RCC>
+  <qresource prefix="foto_perfil">
+    <file>foto_perfil.png</file>
+  </qresource>
+  <qresource prefix="aaa">
+    <file>cloud-download-2.png</file>
+    <file>play_hover.jpg.png</file>
+    <file>adicionar.svg</file>
+    <file>remover.svg</file>
+    <file>wumps.PNG</file>
+    <file>musica.png</file>
+    <file>adicionar.png</file>
+    <file>engrenagem.png</file>
+    <file>home.png</file>
+    <file>playlist.png</file>
+    <file>remover.png</file>
+    <file>auto-falante_hover.png</file>
+    <file>play.jpg.png</file>
+    <file>auto-falante.png</file>
+    <file>pause.png</file>
+    <file>pause_hover.png</file>
+    <file>passar para tras.png</file>
+    <file>passar para tras_hover.png</file>
+    <file>passar para frentre_hover.png</file>
+    <file>passar para frentre.png</file>
+    <file>engrenagem.png</file>
+    <file>home.png</file>
+  </qresource>
+</RCC>
