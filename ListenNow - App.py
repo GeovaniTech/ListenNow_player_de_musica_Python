@@ -35,8 +35,9 @@ if banco.is_connected():
 
     cursor.execute('SELECT nome FROM musicas_app')
     banco_musicas = cursor.fetchall()
-    #cursor.execute('DELETE FROM musicas_app')
-    #banco.commit()
+    # cursor.execute('DELETE FROM musicas_app')
+    # banco.commit()
+
 
 class FrmPrincipal(QMainWindow):
 
@@ -194,6 +195,7 @@ class FrmPrincipal(QMainWindow):
             self.nome_musica_artista()
 
     def nome_musica_artista(self):
+        eyed3.log.setLevel("ERROR")
         audiofile = eyed3.load(banco_musicas[id_musica][0])
         if audiofile.tag.title is None:
             self.ui.lbl_nome_musica.setText(os.path.basename(banco_musicas[id_musica][0][:-4]))
@@ -254,10 +256,8 @@ class FrmPrincipal(QMainWindow):
     def diretorio_download(self):
 
         global diretorio
-
         Tk().withdraw()
         diretorio = askdirectory()
-        print(diretorio)
 
 
 if __name__ == '__main__':
@@ -266,6 +266,7 @@ if __name__ == '__main__':
     clique_pause_despause = 0
     id_musica = 0
     diretorio = ''
+
     # Configuração do Sistema
     app = QApplication(sys.argv)
     window = FrmPrincipal()
