@@ -1,9 +1,12 @@
+import time
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from View.PY.ui_ListenNow import Ui_ListenNow
 from tkinter.filedialog import askopenfilenames, askdirectory
 from tkinter import Tk
+from time import sleep
 
 import mysql.connector
 import pygame
@@ -283,6 +286,7 @@ class FrmPrincipal(QMainWindow):
         global banco_musicas
         global clique_pause_despause
         global id_musica
+
         cursor.execute("SELECT nome FROM musicas_app")
         banco_musicas = cursor.fetchall()
 
@@ -295,13 +299,15 @@ class FrmPrincipal(QMainWindow):
             v2 = item_combobox == audiofile.tag.title
             v3 = item_combobox == os.path.basename(musica[0][:-4])
 
+
             if v1 or v2 or v3:
+
                 cursor.execute(f"DELETE FROM musicas_app WHERE nome = '{musica[0]}'")
                 banco.commit()
                 self.ui.comboBox.removeItem(self.ui.comboBox.currentIndex())
 
-        cursor.execute("SELECT nome FROM musicas_app")
-        banco_musicas = cursor.fetchall()
+                cursor.execute("SELECT nome FROM musicas_app")
+                banco_musicas = cursor.fetchall()
 
         if len(banco_musicas) == 0:
             self.ui.lbl_nome_musica.setText('Música')
@@ -309,20 +315,11 @@ class FrmPrincipal(QMainWindow):
             clique_pause_despause = 0
             pygame.mixer.music.unload()
             id_musica = 0
-            self.ui.btn_pausar_play.setStyleSheet('QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
-                    'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
-
-        if len(banco_musicas) >= 1:
-            id_musica -= 1
-            pygame.mixer.music.load(banco_musicas[id_musica][0])
-            clique_pause_despause = 0
-            self.nome_musica_artista()
             self.ui.btn_pausar_play.setStyleSheet(
                 'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
                 'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
-
-        if len(banco_musicas) - 1 == id_musica:
-            id_musica = 0
+        elif len(banco_musicas) >= 1 and id_musica > 0:
+            id_musica -= 1
             pygame.mixer.music.load(banco_musicas[id_musica][0])
             clique_pause_despause = 0
             self.nome_musica_artista()
