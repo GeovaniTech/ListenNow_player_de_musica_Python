@@ -60,6 +60,15 @@ class FrmPrincipal(QMainWindow):
             'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
             'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
 
+        for musica in banco_musicas:
+            eyed3.log.setLevel("ERROR")
+            audiofile = eyed3.load(musica[0])
+
+            if audiofile.tag.title is None:
+                self.ui.comboBox.addItem(os.path.basename(musica[0]))
+            else:
+                self.ui.comboBox.addItem(audiofile.tag.title)
+
         # Clique dos botões
         self.ui.btn_home.clicked.connect(self.btn_home_clicked)
         self.ui.btn_download.clicked.connect(self.btn_donwloader_clicked)
@@ -95,13 +104,15 @@ class FrmPrincipal(QMainWindow):
             # Pausando a Música
             if clique_pause_despause % 2 == 0:
                 pygame.mixer.music.pause()
-                self.ui.btn_pausar_play.setStyleSheet('QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
-                                                      'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
+                self.ui.btn_pausar_play.setStyleSheet(
+                    'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
+                    'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
 
             # Despausando a Música
             else:
-                self.ui.btn_pausar_play.setStyleSheet('QPushButton {border: 0px solid;background-image: url(:/aaa/pause.png);}'
-                                                      'QPushButton:hover {background-image: url(:/aaa/pause_hover.png);}')
+                self.ui.btn_pausar_play.setStyleSheet(
+                    'QPushButton {border: 0px solid;background-image: url(:/aaa/pause.png);}'
+                    'QPushButton:hover {background-image: url(:/aaa/pause_hover.png);}')
                 pygame.mixer.music.unpause()
 
     def volume(self, value):
@@ -143,9 +154,17 @@ class FrmPrincipal(QMainWindow):
 
                     print('Adicionando música ao banco!')
                     comando_SQL = 'INSERT INTO musicas_app (id, nome) VALUES (%s,%s)'
-                    dados = (f"{id}", f"{musica}")
+                    dados = (f"0", f"{musica}")
                     cursor.execute(comando_SQL, dados)
                     banco.commit()
+
+                    eyed3.log.setLevel("ERROR")
+                    audiofile = eyed3.load(musica)
+
+                    if audiofile.tag.title is None:
+                        self.ui.comboBox.addItem(os.path.basename(musica))
+                    else:
+                        self.ui.comboBox.addItem(audiofile.tag.title)
 
         # Atualizando o banco_musicas
         cursor.execute('SELECT nome FROM musicas_app')
@@ -153,6 +172,7 @@ class FrmPrincipal(QMainWindow):
 
     def btn_remover_musicas_clicked(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.remover_musicas)
+        self.ui.btn_deletar.clicked.connect(self.deletar_musica)
 
     def btn_donwloader_clicked(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.downloader)
@@ -259,9 +279,57 @@ class FrmPrincipal(QMainWindow):
         Tk().withdraw()
         diretorio = askdirectory()
 
+    def deletar_musica(self):
+        global banco_musicas
+        global clique_pause_despause
+        global id_musica
+        cursor.execute("SELECT nome FROM musicas_app")
+        banco_musicas = cursor.fetchall()
 
+        item_combobox = self.ui.comboBox.currentText()
+
+        for musica in banco_musicas:
+            eyed3.log.setLevel("ERROR")
+            audiofile = eyed3.load(musica[0])
+            v1 = item_combobox == os.path.basename(musica[0])
+            v2 = item_combobox == audiofile.tag.title
+            v3 = item_combobox == os.path.basename(musica[0][:-4])
+
+            if v1 or v2 or v3:
+                cursor.execute(f"DELETE FROM musicas_app WHERE nome = '{musica[0]}'")
+                banco.commit()
+                self.ui.comboBox.removeItem(self.ui.comboBox.currentIndex())
+
+        cursor.execute("SELECT nome FROM musicas_app")
+        banco_musicas = cursor.fetchall()
+
+        if len(banco_musicas) == 0:
+            self.ui.lbl_nome_musica.setText('Música')
+            self.ui.lbl_nome_artista.setText('Artista')
+            clique_pause_despause = 0
+            pygame.mixer.music.unload()
+            id_musica = 0
+            self.ui.btn_pausar_play.setStyleSheet('QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
+                    'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
+
+        if len(banco_musicas) >= 1:
+            id_musica -= 1
+            pygame.mixer.music.load(banco_musicas[id_musica][0])
+            clique_pause_despause = 0
+            self.nome_musica_artista()
+            self.ui.btn_pausar_play.setStyleSheet(
+                'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
+                'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
+
+        if len(banco_musicas) - 1 == id_musica:
+            id_musica = 0
+            pygame.mixer.music.load(banco_musicas[id_musica][0])
+            clique_pause_despause = 0
+            self.nome_musica_artista()
+            self.ui.btn_pausar_play.setStyleSheet(
+                'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
+                'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
 if __name__ == '__main__':
-
     # Variáveis do Sistema
     clique_pause_despause = 0
     id_musica = 0
