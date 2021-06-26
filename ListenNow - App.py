@@ -1,13 +1,3 @@
-import time
-
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from View.PY.ui_ListenNow import Ui_ListenNow
-from tkinter.filedialog import askopenfilenames, askdirectory
-from tkinter import Tk
-from time import sleep
-
 import mysql.connector
 import pygame
 import sys
@@ -15,6 +5,14 @@ import os
 import eyed3
 import youtube_dl
 import shutil
+
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from View.PY.ui_ListenNow import Ui_ListenNow
+from tkinter.filedialog import askopenfilenames, askdirectory
+from tkinter import Tk
+
 
 # Configurando Banco
 banco = mysql.connector.connect(
@@ -36,7 +34,7 @@ if banco.is_connected():
     for nome_banco in linha:
         print(f'Conectado ao {nome_banco}')
 
-    cursor.execute('SELECT nome FROM musicas_app')
+    cursor.execute('SELECT nome FROM musicas_app ORDER BY id ASC')
     banco_musicas = cursor.fetchall()
     # cursor.execute('DELETE FROM musicas_app')
     # banco.commit()
@@ -92,6 +90,7 @@ class FrmPrincipal(QMainWindow):
 
         # Verificando se botão pause/despause é igual a 0 e se o total de músicas na lista é maior ou igual a 1
         if len(banco_musicas) >= 1 and clique_pause_despause == 0:
+
             global id_musica
             clique_pause_despause += 1
 
@@ -137,7 +136,7 @@ class FrmPrincipal(QMainWindow):
     def btn_adicionar_musicas_clicked(self):
 
         global banco_musicas
-
+        global novo_id
         Tk().withdraw()
         filename = askopenfilenames()
 
@@ -154,10 +153,16 @@ class FrmPrincipal(QMainWindow):
                 except:
                     # Adicionando música ao banco de dados
                     print(musica)
-
+                    cursor.execute("SELECT MAX(ID) FROM musicas_app")
+                    ultimo_id = cursor.fetchone()
+                    for n in ultimo_id:
+                        if n == None:
+                            novo_id = 0
+                        else:
+                            novo_id = int(n) + 1
                     print('Adicionando música ao banco!')
                     comando_SQL = 'INSERT INTO musicas_app (id, nome) VALUES (%s,%s)'
-                    dados = (f"0", f"{musica}")
+                    dados = (f"{novo_id}", f"{musica}")
                     cursor.execute(comando_SQL, dados)
                     banco.commit()
 
@@ -170,7 +175,7 @@ class FrmPrincipal(QMainWindow):
                         self.ui.comboBox.addItem(audiofile.tag.title)
 
         # Atualizando o banco_musicas
-        cursor.execute('SELECT nome FROM musicas_app')
+        cursor.execute('SELECT nome FROM musicas_app ORDER BY id ASC')
         banco_musicas = cursor.fetchall()
 
     def btn_remover_musicas_clicked(self):
@@ -283,11 +288,12 @@ class FrmPrincipal(QMainWindow):
         diretorio = askdirectory()
 
     def deletar_musica(self):
+
         global banco_musicas
         global clique_pause_despause
         global id_musica
 
-        cursor.execute("SELECT nome FROM musicas_app")
+        cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
         banco_musicas = cursor.fetchall()
 
         item_combobox = self.ui.comboBox.currentText()
@@ -299,17 +305,15 @@ class FrmPrincipal(QMainWindow):
             v2 = item_combobox == audiofile.tag.title
             v3 = item_combobox == os.path.basename(musica[0][:-4])
 
-
             if v1 or v2 or v3:
-
                 cursor.execute(f"DELETE FROM musicas_app WHERE nome = '{musica[0]}'")
                 banco.commit()
                 self.ui.comboBox.removeItem(self.ui.comboBox.currentIndex())
 
-                cursor.execute("SELECT nome FROM musicas_app")
+                cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
                 banco_musicas = cursor.fetchall()
 
-        if len(banco_musicas) == 0:
+'''        if len(banco_musicas) == 0:
             self.ui.lbl_nome_musica.setText('Música')
             self.ui.lbl_nome_artista.setText('Artista')
             clique_pause_despause = 0
@@ -318,6 +322,7 @@ class FrmPrincipal(QMainWindow):
             self.ui.btn_pausar_play.setStyleSheet(
                 'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
                 'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
+
         elif len(banco_musicas) >= 1 and id_musica > 0:
             id_musica -= 1
             pygame.mixer.music.load(banco_musicas[id_musica][0])
@@ -325,13 +330,15 @@ class FrmPrincipal(QMainWindow):
             self.nome_musica_artista()
             self.ui.btn_pausar_play.setStyleSheet(
                 'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
-                'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
+                'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')'''
+
+
 if __name__ == '__main__':
     # Variáveis do Sistema
     clique_pause_despause = 0
     id_musica = 0
     diretorio = ''
-
+    novo_id = 0
     # Configuração do Sistema
     app = QApplication(sys.argv)
     window = FrmPrincipal()
