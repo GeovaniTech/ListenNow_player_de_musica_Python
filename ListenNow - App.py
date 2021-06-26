@@ -336,7 +336,7 @@ class FrmPrincipal(QMainWindow):
                 cursor.execute(f"UPDATE musicas_app set id = {musica[0] - 1} WHERE nome = '{musica[1]}'")
                 banco.commit()
 
-        if id_deletado == len(banco_musicas) and id_musica == id_deletado:
+        if id_deletado == len(banco_musicas) and id_musica == id_deletado and id_musica > 0:
             cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
             banco_musicas = cursor.fetchall()
 
@@ -350,25 +350,15 @@ class FrmPrincipal(QMainWindow):
                 'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
                 'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
 
-        elif id_deletado != len(banco_musicas) and id_musica > 0:
+        if id_deletado != len(banco_musicas) and id_musica > 0:
             id_musica -= 1
             print(f'o id atual é igual a {id_musica}')
             cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
             banco_musicas = cursor.fetchall()
 
-        elif id_deletado != len(banco_musicas) and id_musica > 0 and id_deletado == id_musica:
-            id_musica -= 1
-            print(f'o id atual é igual a {id_musica}')
-            cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
-            banco_musicas = cursor.fetchall()
-            pygame.mixer.music.unload()
-            pygame.mixer.music.load(banco_musicas[id_musica][0])
-            clique_pause_despause = 0
-            self.nome_musica_artista()
-            self.ui.btn_pausar_play.setStyleSheet(
-                'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
-                'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
-        elif id_deletado == 0 and len(banco_musicas) > 0:
+
+
+        if id_deletado == 0 and len(banco_musicas) > 0:
             print(f'id atual é igual a {id_musica}')
             cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
             banco_musicas = cursor.fetchall()
@@ -381,7 +371,7 @@ class FrmPrincipal(QMainWindow):
                 'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
                 'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
 
-        elif len(banco_musicas) == 0:
+        elif len(banco_musicas) == 0 and id_musica == 0:
             print(f'id atual é igual a {id_musica}')
             self.ui.lbl_nome_musica.setText('Música')
             self.ui.lbl_nome_artista.setText('Artista')
