@@ -43,6 +43,7 @@ if banco.is_connected():
 class FrmPrincipal(QMainWindow):
 
     def __init__(self):
+        global id_musica
         QMainWindow.__init__(self)
 
         pygame.init()
@@ -69,7 +70,11 @@ class FrmPrincipal(QMainWindow):
                 self.ui.comboBox.addItem(os.path.basename(musica[0]))
             else:
                 self.ui.comboBox.addItem(audiofile.tag.title)
-
+        cursor.execute("SELECT MIN(ID) FROM musicas_app")
+        primeiro_id = cursor.fetchone()
+        for n in primeiro_id:
+            if n != None:
+                id_musica = n
         # Clique dos botões
         self.ui.btn_home.clicked.connect(self.btn_home_clicked)
         self.ui.btn_download.clicked.connect(self.btn_donwloader_clicked)
@@ -94,9 +99,13 @@ class FrmPrincipal(QMainWindow):
             global id_musica
             clique_pause_despause += 1
 
+            cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
+            banco_musicas = cursor.fetchall()
+            print(id_musica)
+
             # Tocando a primeira música do banco
             pygame.mixer.music.set_volume(0.1)
-            pygame.mixer.music.load(banco_musicas[0][0])
+            pygame.mixer.music.load(banco_musicas[id_musica][0])
             pygame.mixer.music.play()
             self.nome_musica_artista()
 
@@ -193,7 +202,6 @@ class FrmPrincipal(QMainWindow):
         global clique_pause_despause
 
         if clique_pause_despause > 0 and len(banco_musicas) > 1:
-
             # Verificando se chegou na última música da lista
             if id_musica == len(banco_musicas) - 1:
 
@@ -223,6 +231,9 @@ class FrmPrincipal(QMainWindow):
             self.nome_musica_artista()
 
     def nome_musica_artista(self):
+        global id_musica
+        print(id_musica)
+
         eyed3.log.setLevel("ERROR")
         audiofile = eyed3.load(banco_musicas[id_musica][0])
         if audiofile.tag.title is None:
@@ -293,27 +304,51 @@ class FrmPrincipal(QMainWindow):
         global clique_pause_despause
         global id_musica
 
-        cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
+        id_deletado = 0
+        cursor.execute("SELECT * FROM musicas_app ORDER BY id ASC")
         banco_musicas = cursor.fetchall()
 
         item_combobox = self.ui.comboBox.currentText()
 
         for musica in banco_musicas:
             eyed3.log.setLevel("ERROR")
-            audiofile = eyed3.load(musica[0])
-            v1 = item_combobox == os.path.basename(musica[0])
+            audiofile = eyed3.load(musica[1])
+            v1 = item_combobox == os.path.basename(musica[1])
             v2 = item_combobox == audiofile.tag.title
-            v3 = item_combobox == os.path.basename(musica[0][:-4])
+            v3 = item_combobox == os.path.basename(musica[1][:-4])
 
             if v1 or v2 or v3:
-                cursor.execute(f"DELETE FROM musicas_app WHERE nome = '{musica[0]}'")
+                id_deletado = musica[0]
+                cursor.execute(f"DELETE FROM musicas_app WHERE nome = '{musica[1]}'")
                 banco.commit()
                 self.ui.comboBox.removeItem(self.ui.comboBox.currentIndex())
 
-                cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
-                banco_musicas = cursor.fetchall()
+        cursor.execute("SELECT * FROM musicas_app ORDER BY id ASC")
+        banco_musicas = cursor.fetchall()
 
-'''        if len(banco_musicas) == 0:
+        for musica in banco_musicas:
+
+            if musica[0] > id_deletado:
+                cursor.execute(f"UPDATE musicas_app set id = {musica[0] - 1} WHERE nome = '{musica[1]}'")
+                banco.commit()
+
+        if id_deletado == len(banco_musicas) and id_musica == id_deletado:
+            cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
+            banco_musicas = cursor.fetchall()
+
+            id_musica -= 1
+            pygame.mixer.music.unload()
+            pygame.mixer.music.load(banco_musicas[id_musica][0])
+            clique_pause_despause = 0
+            self.nome_musica_artista()
+            self.ui.btn_pausar_play.setStyleSheet(
+                'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
+                'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
+
+        elif id_deletado != len(banco_musicas):
+            id_musica -= 1
+
+        elif len(banco_musicas) == 0:
             self.ui.lbl_nome_musica.setText('Música')
             self.ui.lbl_nome_artista.setText('Artista')
             clique_pause_despause = 0
@@ -323,15 +358,6 @@ class FrmPrincipal(QMainWindow):
                 'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
                 'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
 
-        elif len(banco_musicas) >= 1 and id_musica > 0:
-            id_musica -= 1
-            pygame.mixer.music.load(banco_musicas[id_musica][0])
-            clique_pause_despause = 0
-            self.nome_musica_artista()
-            self.ui.btn_pausar_play.setStyleSheet(
-                'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
-                'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')'''
-
 
 if __name__ == '__main__':
     # Variáveis do Sistema
@@ -339,6 +365,7 @@ if __name__ == '__main__':
     id_musica = 0
     diretorio = ''
     novo_id = 0
+
     # Configuração do Sistema
     app = QApplication(sys.argv)
     window = FrmPrincipal()
