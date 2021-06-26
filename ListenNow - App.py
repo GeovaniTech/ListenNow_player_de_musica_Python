@@ -101,7 +101,6 @@ class FrmPrincipal(QMainWindow):
 
             cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
             banco_musicas = cursor.fetchall()
-            print(id_musica)
 
             # Tocando a primeira música do banco
             pygame.mixer.music.set_volume(0.1)
@@ -201,6 +200,9 @@ class FrmPrincipal(QMainWindow):
         global banco_musicas
         global clique_pause_despause
 
+        cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
+        banco_musicas = cursor.fetchall()
+
         if clique_pause_despause > 0 and len(banco_musicas) > 1:
             # Verificando se chegou na última música da lista
             if id_musica == len(banco_musicas) - 1:
@@ -223,6 +225,8 @@ class FrmPrincipal(QMainWindow):
         global id_musica
         global banco_musicas
 
+        cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
+        banco_musicas = cursor.fetchall()
         # Verificando se id da música é maior ou igual a 1, para assim tirar um valor do id
         if id_musica >= 1:
             id_musica -= 1
@@ -337,6 +341,7 @@ class FrmPrincipal(QMainWindow):
             banco_musicas = cursor.fetchall()
 
             id_musica -= 1
+            print(f'id atual é igual a {id_musica}')
             pygame.mixer.music.unload()
             pygame.mixer.music.load(banco_musicas[id_musica][0])
             clique_pause_despause = 0
@@ -345,10 +350,39 @@ class FrmPrincipal(QMainWindow):
                 'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
                 'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
 
-        elif id_deletado != len(banco_musicas):
+        elif id_deletado != len(banco_musicas) and id_musica > 0:
             id_musica -= 1
+            print(f'o id atual é igual a {id_musica}')
+            cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
+            banco_musicas = cursor.fetchall()
+
+        elif id_deletado != len(banco_musicas) and id_musica > 0 and id_deletado == id_musica:
+            id_musica -= 1
+            print(f'o id atual é igual a {id_musica}')
+            cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
+            banco_musicas = cursor.fetchall()
+            pygame.mixer.music.unload()
+            pygame.mixer.music.load(banco_musicas[id_musica][0])
+            clique_pause_despause = 0
+            self.nome_musica_artista()
+            self.ui.btn_pausar_play.setStyleSheet(
+                'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
+                'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
+        elif id_deletado == 0 and len(banco_musicas) > 0:
+            print(f'id atual é igual a {id_musica}')
+            cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
+            banco_musicas = cursor.fetchall()
+
+            pygame.mixer.music.unload()
+            pygame.mixer.music.load(banco_musicas[id_musica][0])
+            clique_pause_despause = 0
+            self.nome_musica_artista()
+            self.ui.btn_pausar_play.setStyleSheet(
+                'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
+                'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
 
         elif len(banco_musicas) == 0:
+            print(f'id atual é igual a {id_musica}')
             self.ui.lbl_nome_musica.setText('Música')
             self.ui.lbl_nome_artista.setText('Artista')
             clique_pause_despause = 0
