@@ -68,7 +68,9 @@ class FrmPrincipal(QMainWindow):
         self.ui.tableWidget.setHorizontalHeaderLabels(colunas)
 
         self.ui.tableWidget.setColumnWidth(0, 550)
-        self.ui.tableWidget.setColumnWidth(1, 82)
+        self.ui.tableWidget.setColumnWidth(1, 99)
+
+        self.ui.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         row = 0
 
@@ -93,15 +95,6 @@ class FrmPrincipal(QMainWindow):
                 self.ui.tableWidget.setItem(row, 0, QTableWidgetItem(audiofile.tag.title))
                 row += 1
 
-        for musica in banco_musicas:
-            eyed3.log.setLevel("ERROR")
-            audiofile = eyed3.load(musica[1])
-
-            if audiofile.tag.title is None:
-                self.ui.comboBox.addItem(os.path.basename(musica[1]))
-            else:
-                self.ui.comboBox.addItem(audiofile.tag.title)
-
         cursor.execute("SELECT MIN(ID) FROM musicas_app")
         primeiro_id = cursor.fetchone()
 
@@ -111,6 +104,7 @@ class FrmPrincipal(QMainWindow):
 
         # Home
         self.ui.btn_home.clicked.connect(self.btn_home_clicked)
+        self.ui.tableWidget.doubleClicked.connect(self.tocar_musica_lista)
 
         # Downlaod
         self.ui.btn_download.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.downloader))
@@ -171,6 +165,23 @@ class FrmPrincipal(QMainWindow):
                     'QPushButton:hover {background-image: url(:/aaa/pause_hover.png);}')
                 pygame.mixer.music.unpause()
 
+    def tocar_musica_lista(self):
+        global id_musica
+        global clique_pause_despause
+        cursor.execute('SELECT nome FROM musicas_app ORDER BY id ASC')
+        banco_musicas = cursor.fetchall()
+
+        musica = self.ui.tableWidget.currentIndex().row()
+
+        if clique_pause_despause == 0:
+            self.tocar_musica()
+        else:
+            id_musica = int(musica)
+            pygame.mixer.music.load(banco_musicas[id_musica][0])
+            pygame.mixer.music.play()
+
+            self.nome_musica_artista()
+
     def volume(self, value):
         # Ajustando o volume da música
         volume = f"{0}.{value}"
@@ -226,18 +237,31 @@ class FrmPrincipal(QMainWindow):
 
                     self.ui.comboBox.clear()
 
-                    cursor.execute('SELECT nome FROM musicas_app ORDER BY id ASC')
+                    cursor.execute('SELECT * FROM musicas_app ORDER BY id ASC')
                     banco_musicas = cursor.fetchall()
+        cursor.execute('SELECT * FROM musicas_app ORDER BY id ASC')
+        banco_musicas = cursor.fetchall()
+        row = 0
 
-                    for m in banco_musicas:
-                        eyed3.log.setLevel("ERROR")
-                        audiofile = eyed3.load(m[0])
+        self.ui.tableWidget.setRowCount(len(banco_musicas))
 
-                        if audiofile.tag.title is None:
-                            self.ui.comboBox.addItem(os.path.basename(m[0]))
-                        else:
-                            self.ui.comboBox.addItem(audiofile.tag.title)
+        for musica in banco_musicas:
 
+            eyed3.log.setLevel("ERROR")
+            audiofile = eyed3.load(musica[1])
+
+            if audiofile.tag.title is None:
+                self.ui.comboBox.addItem(os.path.basename(musica[1]))
+
+                self.ui.tableWidget.setItem(row, 1, QTableWidgetItem(str(musica[0])))
+                self.ui.tableWidget.setItem(row, 0, QTableWidgetItem(os.path.basename(musica[1])))
+                row += 1
+            else:
+                self.ui.comboBox.addItem(audiofile.tag.title)
+
+                self.ui.tableWidget.setItem(row, 1, QTableWidgetItem(str(musica[0])))
+                self.ui.tableWidget.setItem(row, 0, QTableWidgetItem(audiofile.tag.title))
+                row += 1
         # Atualizando o banco_musicas
         cursor.execute('SELECT nome FROM musicas_app ORDER BY id ASC')
         banco_musicas = cursor.fetchall()
@@ -350,7 +374,6 @@ class FrmPrincipal(QMainWindow):
         global id_musica
 
         id_deletado = 0
-
         cursor.execute("SELECT * FROM musicas_app ORDER BY id ASC")
         banco_musicas = cursor.fetchall()
 
@@ -364,17 +387,15 @@ class FrmPrincipal(QMainWindow):
             v3 = item_combobox == os.path.basename(musica[1][:-4])
 
             if v1 == True or v2 == True or v3 == True:
-                self.ui.comboBox.removeItem(self.ui.comboBox.currentIndex())
+
                 id_deletado = musica[0]
-                print(f'ID = {musica[0]}')
+
                 cursor.execute(f"DELETE FROM musicas_app WHERE id = '{id_deletado}'")
                 banco.commit()
                 cursor.execute("SELECT * FROM musicas_app ORDER BY id ASC")
                 banco_musicas = cursor.fetchall()
 
-                print(f'Músicas no banco: {banco_musicas}')
-
-
+        self.ui.comboBox.removeItem(self.ui.comboBox.currentIndex())
         cursor.execute("SELECT * FROM musicas_app ORDER BY id ASC")
         banco_musicas = cursor.fetchall()
 
@@ -428,15 +449,33 @@ class FrmPrincipal(QMainWindow):
                 'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
                 'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
 
+        cursor.execute("SELECT * FROM musicas_app ORDER BY id ASC")
+        banco_musicas = cursor.fetchall()
+
+        row = 0
+
+        self.ui.tableWidget.setRowCount(len(banco_musicas))
+
+        for musica in banco_musicas:
+
+            eyed3.log.setLevel("ERROR")
+            audiofile = eyed3.load(musica[1])
+
+            if audiofile.tag.title is None:
+                self.ui.tableWidget.setItem(row, 1, QTableWidgetItem(str(musica[0])))
+                self.ui.tableWidget.setItem(row, 0, QTableWidgetItem(os.path.basename(musica[1])))
+                row += 1
+            else:
+                self.ui.tableWidget.setItem(row, 1, QTableWidgetItem(str(musica[0])))
+                self.ui.tableWidget.setItem(row, 0, QTableWidgetItem(audiofile.tag.title))
+                row += 1
+
 
 if __name__ == '__main__':
     # Variáveis do Sistema
     clique_pause_despause = 0
-
     id_musica = 0
-
     diretorio = ''
-
     novo_id = 0
 
     # Configuração do Sistema

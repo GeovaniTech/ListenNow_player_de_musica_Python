@@ -17,6 +17,9 @@ class Ui_ListenNow(object):
         MainWindow.resize(1002, 545)
         MainWindow.setMinimumSize(QtCore.QSize(1002, 545))
         MainWindow.setMaximumSize(QtCore.QSize(1002, 545))
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/foto_perfil/logo listen Now.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         MainWindow.setStyleSheet("")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -35,26 +38,8 @@ class Ui_ListenNow(object):
         self.foto_perfil.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.foto_perfil.setFrameShadow(QtWidgets.QFrame.Raised)
         self.foto_perfil.setObjectName("foto_perfil")
-        self.btn_playlist = QtWidgets.QPushButton(self.aba_perfil)
-        self.btn_playlist.setGeometry(QtCore.QRect(0, 250, 231, 41))
-        self.btn_playlist.setStyleSheet("QPushButton {\n"
-"    border: 0px solid rgb(17, 98, 102);\n"
-"    color: white;\n"
-"    font: 10pt \"Montserrat\";\n"
-"    text-align: left\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: #178c90;\n"
-"}\n"
-"\n"
-"QPushButton_6 {\n"
-"    \n"
-"    background-color: rgb(0, 85, 255);\n"
-"}")
-        self.btn_playlist.setObjectName("btn_playlist")
         self.btn_remover = QtWidgets.QPushButton(self.aba_perfil)
-        self.btn_remover.setGeometry(QtCore.QRect(0, 330, 231, 41))
+        self.btn_remover.setGeometry(QtCore.QRect(0, 290, 231, 41))
         self.btn_remover.setStyleSheet("QPushButton {\n"
 "    border: 0px solid rgb(17, 98, 102);\n"
 "    color: white;\n"
@@ -67,7 +52,7 @@ class Ui_ListenNow(object):
 "}")
         self.btn_remover.setObjectName("btn_remover")
         self.btn_adicionar = QtWidgets.QPushButton(self.aba_perfil)
-        self.btn_adicionar.setGeometry(QtCore.QRect(0, 290, 231, 41))
+        self.btn_adicionar.setGeometry(QtCore.QRect(0, 250, 231, 41))
         self.btn_adicionar.setStyleSheet("QPushButton {\n"
 "    border: 0px solid rgb(17, 98, 102);\n"
 "    color: white;\n"
@@ -84,25 +69,8 @@ class Ui_ListenNow(object):
         self.lbl_nome.setStyleSheet("font: 12pt \"Montserrat\";\n"
 "color: white;")
         self.lbl_nome.setObjectName("lbl_nome")
-        self.btn_playlist_icon = QtWidgets.QPushButton(self.aba_perfil)
-        self.btn_playlist_icon.setGeometry(QtCore.QRect(189, 260, 21, 21))
-        self.btn_playlist_icon.setStyleSheet("QPushButton {\n"
-"    border: 0px solid rgb(17, 98, 102);\n"
-"    \n"
-"    background-image: url(:/aaa/playlist.png);\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: #178c90;\n"
-"}")
-        self.btn_playlist_icon.setText("")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("Imagens e Icones/playlist.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.btn_playlist_icon.setIcon(icon)
-        self.btn_playlist_icon.setIconSize(QtCore.QSize(21, 21))
-        self.btn_playlist_icon.setObjectName("btn_playlist_icon")
         self.btn_adicionar_icon = QtWidgets.QPushButton(self.aba_perfil)
-        self.btn_adicionar_icon.setGeometry(QtCore.QRect(190, 300, 21, 21))
+        self.btn_adicionar_icon.setGeometry(QtCore.QRect(190, 260, 21, 21))
         self.btn_adicionar_icon.setStyleSheet("QPushButton {\n"
 "    border: 0px solid rgb(17, 98, 102);\n"
 "    background-image: url(:/aaa/adicionar.png);\n"
@@ -118,7 +86,7 @@ class Ui_ListenNow(object):
         self.btn_adicionar_icon.setIconSize(QtCore.QSize(21, 21))
         self.btn_adicionar_icon.setObjectName("btn_adicionar_icon")
         self.btn_remover_icon = QtWidgets.QPushButton(self.aba_perfil)
-        self.btn_remover_icon.setGeometry(QtCore.QRect(190, 340, 21, 21))
+        self.btn_remover_icon.setGeometry(QtCore.QRect(190, 300, 21, 21))
         self.btn_remover_icon.setStyleSheet("QPushButton {\n"
 "    border: 0px solid rgb(17, 98, 102);\n"
 "    background-image: url(:/aaa/remover.png);\n"
@@ -134,7 +102,7 @@ class Ui_ListenNow(object):
         self.btn_remover_icon.setIconSize(QtCore.QSize(21, 21))
         self.btn_remover_icon.setObjectName("btn_remover_icon")
         self.btn_download = QtWidgets.QPushButton(self.aba_perfil)
-        self.btn_download.setGeometry(QtCore.QRect(0, 370, 231, 41))
+        self.btn_download.setGeometry(QtCore.QRect(0, 330, 231, 41))
         self.btn_download.setStyleSheet("QPushButton {\n"
 "    border: 0px solid rgb(17, 98, 102);\n"
 "    color: white;\n"
@@ -147,7 +115,7 @@ class Ui_ListenNow(object):
 "}")
         self.btn_download.setObjectName("btn_download")
         self.btn_download_icon = QtWidgets.QPushButton(self.aba_perfil)
-        self.btn_download_icon.setGeometry(QtCore.QRect(190, 380, 21, 21))
+        self.btn_download_icon.setGeometry(QtCore.QRect(190, 340, 21, 21))
         self.btn_download_icon.setStyleSheet("QPushButton {\n"
 "    border: 0px solid rgb(17, 98, 102);\n"
 "    \n"
@@ -192,7 +160,9 @@ class Ui_ListenNow(object):
 "    background-color: #178c90;\n"
 "}")
         self.btn_home_icon.setText("")
-        self.btn_home_icon.setIcon(icon)
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap("Imagens e Icones/playlist.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.btn_home_icon.setIcon(icon3)
         self.btn_home_icon.setIconSize(QtCore.QSize(21, 21))
         self.btn_home_icon.setObjectName("btn_home_icon")
         self.frame_2 = QtWidgets.QFrame(self.centralwidget)
@@ -310,7 +280,7 @@ class Ui_ListenNow(object):
 "")
         self.btn_pausar_play.setText("")
         self.btn_pausar_play.setIconSize(QtCore.QSize(30, 30))
-        self.btn_pausar_play.setObjectName("btn_play_paly")
+        self.btn_pausar_play.setObjectName("btn_pausar_play")
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
         self.stackedWidget.setGeometry(QtCore.QRect(230, 0, 771, 461))
         self.stackedWidget.setStyleSheet("")
@@ -318,12 +288,6 @@ class Ui_ListenNow(object):
         self.stackedWidget.setObjectName("stackedWidget")
         self.home = QtWidgets.QWidget()
         self.home.setObjectName("home")
-        self.frame = QtWidgets.QFrame(self.home)
-        self.frame.setGeometry(QtCore.QRect(120, 80, 471, 291))
-        self.frame.setStyleSheet("background-image: url(:/aaa/wumps.PNG);")
-        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame.setObjectName("frame")
         self.lbl_bem_vindo = QtWidgets.QLabel(self.home)
         self.lbl_bem_vindo.setGeometry(QtCore.QRect(130, 20, 501, 51))
         self.lbl_bem_vindo.setStyleSheet("font: 24pt \"Montserrat\";\n"
@@ -337,6 +301,12 @@ class Ui_ListenNow(object):
         self.label.setFont(font)
         self.label.setStyleSheet("color: rgb(212, 212, 213);")
         self.label.setObjectName("label")
+        self.label_2 = QtWidgets.QLabel(self.home)
+        self.label_2.setGeometry(QtCore.QRect(260, 110, 271, 231))
+        self.label_2.setText("")
+        self.label_2.setPixmap(QtGui.QPixmap(":/foto_perfil/logo listen Now.png"))
+        self.label_2.setScaledContents(True)
+        self.label_2.setObjectName("label_2")
         self.stackedWidget.addWidget(self.home)
         self.musicas = QtWidgets.QWidget()
         self.musicas.setObjectName("musicas")
@@ -450,13 +420,12 @@ class Ui_ListenNow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(2)
+        self.stackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "ListenNow"))
-        self.btn_playlist.setText(_translate("MainWindow", "     Playlists"))
         self.btn_remover.setText(_translate("MainWindow", "     Remover Músicas"))
         self.btn_adicionar.setText(_translate("MainWindow", "     Adicionar Músicas"))
         self.lbl_nome.setText(_translate("MainWindow", "Geovani Debastiani"))
@@ -482,7 +451,7 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_ListenNow()
+    ui = Ui_ListenNow
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())

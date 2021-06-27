@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="foto_perfil">
+    <file>logo listen Now.png</file>
     <file>foto_perfil.png</file>
   </qresource>
   <qresource prefix="aaa">
