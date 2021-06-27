@@ -33,7 +33,7 @@ if banco.is_connected():
     for nome_banco in linha:
         print(f'Conectado ao {nome_banco}')
 
-    cursor.execute('SELECT nome FROM musicas_app ORDER BY id ASC')
+    cursor.execute('SELECT * FROM musicas_app ORDER BY id ASC')
     banco_musicas = cursor.fetchall()
     # cursor.execute('DELETE FROM musicas_app')
     # banco.commit()
@@ -61,12 +61,44 @@ class FrmPrincipal(QMainWindow):
             'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
             'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
 
+        self.ui.tableWidget.insertColumn(0)
+        self.ui.tableWidget.insertColumn(0)
+
+        colunas = ['Nome', 'ID']
+        self.ui.tableWidget.setHorizontalHeaderLabels(colunas)
+
+        self.ui.tableWidget.setColumnWidth(0, 550)
+        self.ui.tableWidget.setColumnWidth(1, 82)
+
+        row = 0
+
+        self.ui.tableWidget.setRowCount(len(banco_musicas))
+        self.ui.tableWidget.verticalHeader().setVisible(False)
+
         for musica in banco_musicas:
+
             eyed3.log.setLevel("ERROR")
-            audiofile = eyed3.load(musica[0])
+            audiofile = eyed3.load(musica[1])
 
             if audiofile.tag.title is None:
-                self.ui.comboBox.addItem(os.path.basename(musica[0]))
+                self.ui.comboBox.addItem(os.path.basename(musica[1]))
+
+                self.ui.tableWidget.setItem(row, 1, QTableWidgetItem(str(musica[0])))
+                self.ui.tableWidget.setItem(row, 0, QTableWidgetItem(os.path.basename(musica[1])))
+                row += 1
+            else:
+                self.ui.comboBox.addItem(audiofile.tag.title)
+
+                self.ui.tableWidget.setItem(row, 1, QTableWidgetItem(str(musica[0])))
+                self.ui.tableWidget.setItem(row, 0, QTableWidgetItem(audiofile.tag.title))
+                row += 1
+
+        for musica in banco_musicas:
+            eyed3.log.setLevel("ERROR")
+            audiofile = eyed3.load(musica[1])
+
+            if audiofile.tag.title is None:
+                self.ui.comboBox.addItem(os.path.basename(musica[1]))
             else:
                 self.ui.comboBox.addItem(audiofile.tag.title)
 
