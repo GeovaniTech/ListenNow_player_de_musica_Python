@@ -2,7 +2,7 @@ import mysql.connector
 import pygame
 import sys
 import os
-import eyed3
+import eyed3.utils
 import youtube_dl
 import shutil
 
