@@ -15,10 +15,10 @@ from tkinter import Tk
 
 # Configurando Banco
 banco = mysql.connector.connect(
-    host='localhost',
+    host='192.168.15.2',
     port='3307',
-    user='root',
-    passwd='',
+    user='',
+    passwd='geovani5280',
     database='banco_musicas'
 )
 
@@ -167,10 +167,13 @@ class FrmPrincipal(QMainWindow):
             cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
             banco_musicas = cursor.fetchall()
 
+
+
             # Tocando a primeira música do banco
             pygame.mixer.music.set_volume(0.1)
             pygame.mixer.music.load(banco_musicas[id_musica][0])
             pygame.mixer.music.play()
+
             self.nome_musica_artista()
 
         # Verificando se a primeira música já foi iniciada
@@ -189,6 +192,16 @@ class FrmPrincipal(QMainWindow):
                     'QPushButton {border: 0px solid;background-image: url(:/aaa/pause.png);}'
                     'QPushButton:hover {background-image: url(:/aaa/pause_hover.png);}')
                 pygame.mixer.music.unpause()
+
+        FIM_MUSICA = pygame.USEREVENT+1
+        pygame.mixer.music.set_endevent(FIM_MUSICA)
+
+        while True:
+
+            for event in pygame.event.get():
+
+                if event.type == FIM_MUSICA:
+                    self.passar_musica()
 
     def musicas_da_lista(self):
 
