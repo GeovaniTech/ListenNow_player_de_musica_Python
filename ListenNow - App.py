@@ -429,15 +429,20 @@ class FrmPrincipal(QMainWindow):
             pygame.mixer.music.load(banco_musicas[id_musica][0])
             pygame.mixer.music.play()
 
-        # Verificando se está pausado
-        if clique_pause_despause % 2 == 0:
-            pygame.mixer.music.pause()
+        if id_musica == 0:
+
+            pygame.mixer.music.load(banco_musicas[0][0])
+            pygame.mixer.music.play()
 
         if id_musica < 0:
             id_musica = len(banco_musicas) - 1
 
             pygame.mixer.music.load(banco_musicas[id_musica][0])
             pygame.mixer.music.play()
+
+        # Verificando se está pausado
+        if clique_pause_despause % 2 == 0:
+            pygame.mixer.music.pause()
 
         # Chamando função para definir o nome da música e do artista
         self.nome_musica_artista()
@@ -576,12 +581,14 @@ class FrmPrincipal(QMainWindow):
             if musica[0] > id_deletado:
 
                 # Diminuindo o id das músicas
-                cursor.execute(f"UPDATE musicas_app set id = {musica[0] - 1} WHERE nome = '{musica[1]}'")
+                cursor.execute(f'UPDATE musicas_app set id = {musica[0] - 1} WHERE nome = "{musica[1]}"')
                 banco.commit()
 
         if id_deletado == 0 and len(banco_musicas) == 1:
+
             # Diminuindo o id_musica
             id_musica -= 1
+
             # Pegando todas as músicas do banco
             cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
             banco_musicas = cursor.fetchall()
