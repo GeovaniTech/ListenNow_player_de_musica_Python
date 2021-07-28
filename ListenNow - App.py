@@ -274,7 +274,6 @@ class FrmPrincipal(QMainWindow):
         for musica in filename:
             if musica[-4:] == '.mp3':
                 try:
-
                     # Verificando se a música já está no banco de dados
                     cursor.execute(f'SELECT nome FROM musicas_app WHERE nome = "{musica}"')
                     ok = cursor.fetchall()
@@ -282,75 +281,85 @@ class FrmPrincipal(QMainWindow):
                     print(f'Música já está no Banco de Dados!')
 
                 except:
-                    # Mostrando a tela com a tabela das músicas
-                    self.ui.stackedWidget.setCurrentWidget(self.ui.musicas)
+                    try:
 
-                    # Pegando o id da ultima música adicionada
-                    cursor.execute("SELECT MAX(ID) FROM musicas_app")
-                    ultimo_id = cursor.fetchone()
+                       audiofile = eyed3.load(musica)
+                       if audiofile.tag.title is None:
+                          print()
+                    except:
+                        print('Música corrompida! Removendo música...')
 
-                    # Pegando o id da ultima música adicionada
-                    for n in ultimo_id:
-                        # Caso não tenha id recebe 0
-                        if n == None:
-                            novo_id = 0
-                        else:
-                            novo_id = int(n) + 1
+                    else:
+                        # Mostrando a tela com a tabela das músicas
+                        self.ui.stackedWidget.setCurrentWidget(self.ui.musicas)
 
-                    # Adicionando música ao banco
-                    comando_SQL = 'INSERT INTO musicas_app (id, nome) VALUES (%s,%s)'
-                    dados = (f"{novo_id}", f"{musica}")
-                    cursor.execute(comando_SQL, dados)
-                    banco.commit()
+                        # Pegando o id da ultima música adicionada
+                        cursor.execute("SELECT MAX(ID) FROM musicas_app")
+                        ultimo_id = cursor.fetchone()
 
-                    print('Adicionando música ao banco!')
+                        # Pegando o id da ultima música adicionada
+                        for n in ultimo_id:
+                            # Caso não tenha id recebe 0
+                            if n == None:
+                                novo_id = 0
+                            else:
+                                novo_id = int(n) + 1
 
-                    # Limpando a combobox do deletar_musica
-                    self.ui.comboBox.clear()
+                        # Adicionando música ao banco
+                        comando_SQL = 'INSERT INTO musicas_app (id, nome) VALUES (%s,%s)'
+                        dados = (f"{novo_id}", f"{musica}")
+                        cursor.execute(comando_SQL, dados)
+                        banco.commit()
 
-                    # Atulizando o banco_musicas
-                    cursor.execute('SELECT * FROM musicas_app ORDER BY id ASC')
-                    banco_musicas = cursor.fetchall()
+                        print('Adicionando música ao banco!')
 
-        # Atulizando o banco_musicas
-        cursor.execute('SELECT * FROM musicas_app ORDER BY id ASC')
-        banco_musicas = cursor.fetchall()
+                        # Limpando a combobox do deletar_musica
+                        self.ui.comboBox.clear()
 
-        row = 0
+                        # Atulizando o banco_musicas
+                        cursor.execute('SELECT * FROM musicas_app ORDER BY id ASC')
+                        banco_musicas = cursor.fetchall()
 
-        self.ui.tableWidget.setRowCount(len(banco_musicas))
 
-        # Adicionando as músicas a tabela das músicas
-        for musica in banco_musicas:
+            # Atulizando o banco_musicas
+            cursor.execute('SELECT * FROM musicas_app ORDER BY id ASC')
+            banco_musicas = cursor.fetchall()
 
-            # Tratando o erro dos metadados
-            eyed3.log.setLevel("ERROR")
-            audiofile = eyed3.load(musica[1])
+            row = 0
 
-            # Verificando se há metadados na música
-            if audiofile.tag.title is None:
+            self.ui.tableWidget.setRowCount(len(banco_musicas))
 
-                # Adicionando música com o nome do arquivo, pois não há metadados
-                self.ui.comboBox.addItem(os.path.basename(musica[1]))
+            # Adicionando as músicas a tabela das músicas
+            for musica in banco_musicas:
 
-                # Adicionando na tabela
-                self.ui.tableWidget.setItem(row, 1, QTableWidgetItem(str(musica[0])))
-                self.ui.tableWidget.setItem(row, 0, QTableWidgetItem(os.path.basename(musica[1])))
+                # Tratando o erro dos metadados
+                eyed3.log.setLevel("ERROR")
+                audiofile = eyed3.load(musica[1])
 
-                row += 1
-            else:
-                # Adicionando música com o nome de acordo com os metadados
-                self.ui.comboBox.addItem(audiofile.tag.title)
+                # Verificando se há metadados na música
+                if audiofile.tag.title is None:
 
-                # Adicionando na tabela
-                self.ui.tableWidget.setItem(row, 1, QTableWidgetItem(str(musica[0])))
-                self.ui.tableWidget.setItem(row, 0, QTableWidgetItem(audiofile.tag.title))
+                    # Adicionando música com o nome do arquivo, pois não há metadados
+                    self.ui.comboBox.addItem(os.path.basename(musica[1]))
 
-                row += 1
+                    # Adicionando na tabela
+                    self.ui.tableWidget.setItem(row, 1, QTableWidgetItem(str(musica[0])))
+                    self.ui.tableWidget.setItem(row, 0, QTableWidgetItem(os.path.basename(musica[1])))
 
-        # Atualizando o banco_musicas
-        cursor.execute('SELECT nome FROM musicas_app ORDER BY id ASC')
-        banco_musicas = cursor.fetchall()
+                    row += 1
+                else:
+                    # Adicionando música com o nome de acordo com os metadados
+                    self.ui.comboBox.addItem(audiofile.tag.title)
+
+                    # Adicionando na tabela
+                    self.ui.tableWidget.setItem(row, 1, QTableWidgetItem(str(musica[0])))
+                    self.ui.tableWidget.setItem(row, 0, QTableWidgetItem(audiofile.tag.title))
+
+                    row += 1
+
+            # Atualizando o banco_musicas
+            cursor.execute('SELECT nome FROM musicas_app ORDER BY id ASC')
+            banco_musicas = cursor.fetchall()
 
     def btn_donwloader_clicked(self):
 
