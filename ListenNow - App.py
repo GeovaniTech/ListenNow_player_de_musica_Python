@@ -236,6 +236,10 @@ class FrmPrincipal(QMainWindow):
         # Verificando se está pausado
         if clique_pause_despause % 2 == 0:
             pygame.mixer.music.pause()
+            self.ui.btn_pausar_play.setStyleSheet(
+                'QPushButton {border: 0px solid;background-image: url(:/aaa/play.jpg.png);}'
+                'QPushButton:hover {background-image: url(:/aaa/play_hover.jpg.png);}')
+
 
     def volume(self, value):
 
