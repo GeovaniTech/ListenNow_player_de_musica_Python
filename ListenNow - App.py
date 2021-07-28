@@ -134,7 +134,7 @@ class FrmPrincipal(QMainWindow):
 
         # Deletar Músicas
         self.ui.btn_remover.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.remover_musicas))
-        self.ui.btn_deletar.clicked.connect(lambda: self.deletar_musica()) 
+        self.ui.btn_deletar.clicked.connect(lambda: self.deletar_musica())
 
         # Adicionar Músicas
         self.ui.btn_adicionar.clicked.connect(self.btn_adicionar_musicas_clicked)
@@ -166,8 +166,6 @@ class FrmPrincipal(QMainWindow):
             # Pegando as músicas que estão no banco
             cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
             banco_musicas = cursor.fetchall()
-
-
 
             # Tocando a primeira música do banco
             pygame.mixer.music.set_volume(0.1)
@@ -201,7 +199,8 @@ class FrmPrincipal(QMainWindow):
             for event in pygame.event.get():
 
                 if event.type == FIM_MUSICA:
-                    self.passar_musica()
+                    if len(banco_musicas) > 0:
+                        self.passar_musica()
 
     def musicas_da_lista(self):
 
@@ -232,6 +231,10 @@ class FrmPrincipal(QMainWindow):
 
             # Chamando a função que define o nome da música e do artista
             self.nome_musica_artista()
+
+        # Verificando se está pausado
+        if clique_pause_despause % 2 == 0:
+            pygame.mixer.music.pause()
 
     def volume(self, value):
 
@@ -410,17 +413,15 @@ class FrmPrincipal(QMainWindow):
         cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
         banco_musicas = cursor.fetchall()
 
-        # Verificando se id da música é maior ou igual a 1
+        # Tirando um valor do id_musica
+        id_musica -= 1
+
+        # Verificando se id da música é maior que 1
         if id_musica >= 1:
-            # Tirando um valor do id_musica
-            id_musica -= 1
 
             # Tocando a música anterior
             pygame.mixer.music.load(banco_musicas[id_musica][0])
             pygame.mixer.music.play()
-
-            # Chamando função para definir o nome da música e do artista
-            self.nome_musica_artista()
 
         # Tocando a primeira música do banco
         if len(banco_musicas) == 1:
@@ -431,11 +432,28 @@ class FrmPrincipal(QMainWindow):
         if clique_pause_despause % 2 == 0:
             pygame.mixer.music.pause()
 
+        if id_musica < 0:
+            id_musica = len(banco_musicas) - 1
+
+            pygame.mixer.music.load(banco_musicas[id_musica][0])
+            pygame.mixer.music.play()
+
+
+
+        # Chamando função para definir o nome da música e do artista
+        self.nome_musica_artista()
+
     def nome_musica_artista(self):
         # Chamando as variáveis globals
         global id_musica
+        print('id dessa música', id_musica)
+        cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
+
+        banco_musicas = cursor.fetchall()
+        print('tamanho banco: ', len(banco_musicas))
 
         # Tratando erro dos metadados
+
         eyed3.log.setLevel("ERROR")
         audiofile = eyed3.load(banco_musicas[id_musica][0])
 
@@ -520,7 +538,7 @@ class FrmPrincipal(QMainWindow):
         id_deletado = 0
 
         # Pegando as músicas no banco músicas
-        cursor.execute("SELECT * FROM musicas_app ORDER BY id ASC")
+        cursor.execute('SELECT * FROM musicas_app ORDER BY id ASC')
         banco_musicas = cursor.fetchall()
 
         # Pegando o item selecionado na combobox do deletar_musicas
@@ -545,7 +563,7 @@ class FrmPrincipal(QMainWindow):
                 id_deletado = musica[0]
 
                 # Deletando a música passada pelas verificações
-                cursor.execute(f"DELETE FROM musicas_app WHERE nome = '{musica[1]}'")
+                cursor.execute(f'DELETE FROM musicas_app WHERE nome = "{musica[1]}"')
                 banco.commit()
 
         # Pegando todas as músicas do banco
@@ -678,6 +696,9 @@ class FrmPrincipal(QMainWindow):
 
                 row += 1
 
+        cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
+        banco_musicas = cursor.fetchall()
+        print(id_musica)
 
 if __name__ == '__main__':
 
