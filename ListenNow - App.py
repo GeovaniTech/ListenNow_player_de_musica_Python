@@ -215,19 +215,20 @@ class FrmPrincipal(QMainWindow):
         # Pegando o id da row, da música selecionada
         musica = self.ui.tableWidget.currentIndex().row()
 
-        # Caso o a primeira música não tenha tocado, chama a função tocar_musica
         if clique_pause_despause == 0:
-            self.tocar_musica()
+            clique_pause_despause += 1
 
-        # Tocando a música selecionada
-        else:
-
+        if clique_pause_despause > 0:
             # Defindo o id_musica
             id_musica = int(musica)
 
             # Tocando a música
             pygame.mixer.music.load(banco_musicas[id_musica][0])
             pygame.mixer.music.play()
+
+            self.ui.btn_pausar_play.setStyleSheet(
+                'QPushButton {border: 0px solid;background-image: url(:/aaa/pause.png);}'
+                'QPushButton:hover {background-image: url(:/aaa/pause_hover.png);}')
 
             # Chamando a função que define o nome da música e do artista
             self.nome_musica_artista()
