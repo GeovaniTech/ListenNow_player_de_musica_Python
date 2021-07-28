@@ -438,22 +438,17 @@ class FrmPrincipal(QMainWindow):
             pygame.mixer.music.load(banco_musicas[id_musica][0])
             pygame.mixer.music.play()
 
-
-
         # Chamando função para definir o nome da música e do artista
         self.nome_musica_artista()
 
     def nome_musica_artista(self):
         # Chamando as variáveis globals
         global id_musica
-        print('id dessa música', id_musica)
-        cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
 
+        cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
         banco_musicas = cursor.fetchall()
-        print('tamanho banco: ', len(banco_musicas))
 
         # Tratando erro dos metadados
-
         eyed3.log.setLevel("ERROR")
         audiofile = eyed3.load(banco_musicas[id_musica][0])
 
@@ -584,6 +579,8 @@ class FrmPrincipal(QMainWindow):
                 banco.commit()
 
         if id_deletado == 0 and len(banco_musicas) == 1:
+            # Diminuindo o id_musica
+            id_musica -= 1
             # Pegando todas as músicas do banco
             cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
             banco_musicas = cursor.fetchall()
@@ -638,10 +635,8 @@ class FrmPrincipal(QMainWindow):
             cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
             banco_musicas = cursor.fetchall()
 
-
-
         # Verificando se está deletando a única música do banco
-        if len(banco_musicas) == 0 and id_musica == 0:
+        if len(banco_musicas) == 0: ###
             # Mudando a tela do home
             self.ui.stackedWidget.setCurrentWidget(self.ui.home)
 
@@ -698,7 +693,7 @@ class FrmPrincipal(QMainWindow):
 
         cursor.execute("SELECT nome FROM musicas_app ORDER BY id ASC")
         banco_musicas = cursor.fetchall()
-        print(id_musica)
+
 
 if __name__ == '__main__':
 
